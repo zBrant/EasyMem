@@ -113,3 +113,7 @@ simulator/
 ## Usage
 
 > _To be added._
+
+## License
+
+This project is licensed under the [MIT License](LICENSE) — © 2026 Eduardo Brant.
