@@ -1,14 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Panel } from "@/components/Panel"
 import { EmptyState } from "@/components/EmptyState"
 import { useSimulator } from "@/store/useSimulator"
 import { binaryFields } from "@/engine/address"
 import { cn } from "@/utils/cn"
 
-const BANDS = {
-  tag: "bg-violet-500/15 text-violet-700 border-violet-500/40",
-  index: "bg-sky-500/15 text-sky-700 border-sky-500/40",
-  offset: "bg-emerald-500/15 text-emerald-700 border-emerald-500/40",
+const GROUPS = {
+  tag: { label: "TAG", border: "border-violet-400", text: "text-violet-300" },
+  index: { label: "INDEX", border: "border-cyan-400", text: "text-cyan-300" },
+  offset: { label: "OFFSET", border: "border-emerald-400", text: "text-emerald-300" },
 } as const
+
+type GroupKey = keyof typeof GROUPS
 
 export function AddressView() {
   const steps = useSimulator((s) => s.steps)
@@ -17,64 +19,66 @@ export function AddressView() {
   const step = steps[currentStep]
 
   if (!step || !derived) {
-    return <EmptyState message="No address to display." />
+    return (
+      <Panel label="Address">
+        <EmptyState message="No address to display" />
+      </Panel>
+    )
   }
 
   const fields = binaryFields(step.decomposition, derived)
-  const address = step.access.address
+
+  const groups: { key: GroupKey; bits: string; count: number }[] = []
+  if (derived.tagBits > 0)
+    groups.push({ key: "tag", bits: fields.tag, count: derived.tagBits })
+  if (derived.indexBits > 0)
+    groups.push({ key: "index", bits: fields.index, count: derived.indexBits })
+  groups.push({ key: "offset", bits: fields.offset, count: derived.offsetBits })
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle>Address decomposition</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex gap-4 font-mono text-sm">
-          <span>
-            <span className="text-muted-foreground">dec </span>
-            {address}
+    <Panel label="Address" bodyClassName="p-3">
+      <div className="space-y-2.5">
+        <div className="flex items-baseline gap-3 font-mono">
+          <span className="text-xs text-muted-foreground">
+            0x{step.access.address.toString(16)}
           </span>
-          <span>
-            <span className="text-muted-foreground">hex </span>0x
-            {address.toString(16)}
+          <span className="text-xs text-muted-foreground/70">
+            {step.decomposition.binary.length}b
           </span>
         </div>
 
-        <div className="flex overflow-x-auto rounded-md border font-mono text-sm">
-          {derived.tagBits > 0 && (
-            <Band label="tag" value={fields.tag} bits={derived.tagBits} className={BANDS.tag} />
-          )}
-          {derived.indexBits > 0 && (
-            <Band label="index" value={fields.index} bits={derived.indexBits} className={BANDS.index} />
-          )}
-          <Band label="offset" value={fields.offset} bits={derived.offsetBits} className={BANDS.offset} />
+        <div className="flex flex-wrap gap-2">
+          {groups.map((group) => {
+            const g = GROUPS[group.key]
+            return (
+              <div key={group.key} className="flex flex-col gap-1">
+                <div className="flex">
+                  {group.bits.split("").map((bit, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex h-7 w-5 items-center justify-center border-b-2 font-mono text-xs",
+                        g.border,
+                        bit === "1" ? "text-foreground" : "text-muted-foreground/50",
+                      )}
+                    >
+                      {bit}
+                    </div>
+                  ))}
+                </div>
+                <span
+                  className={cn(
+                    "font-mono text-[9px] uppercase tracking-wide",
+                    g.text,
+                  )}
+                >
+                  {g.label} {group.count}
+                </span>
+              </div>
+            )
+          })}
         </div>
-
-        <p className="break-all font-mono text-xs text-muted-foreground">
-          {step.decomposition.binary}
-        </p>
-      </CardContent>
-    </Card>
-  )
-}
-
-function Band({
-  label,
-  value,
-  bits,
-  className,
-}: {
-  label: string
-  value: string
-  bits: number
-  className: string
-}) {
-  return (
-    <div className={cn("flex flex-col items-center px-2 py-1", className)}>
-      <span className="text-[10px] uppercase tracking-wide opacity-70">
-        {label} · {bits}b
-      </span>
-      <span className="tracking-wider">{value || "—"}</span>
-    </div>
+      </div>
+    </Panel>
   )
 }

@@ -2,35 +2,35 @@ import type { AccessResult } from "@/engine/types"
 
 export interface ResultStyle {
   label: string
-  badge: string
-  highlight: string
+  dot: string
   text: string
+  cell: string
 }
 
 const STYLES: Record<AccessResult, ResultStyle> = {
   hit: {
-    label: "Hit",
-    badge: "bg-emerald-500/15 text-emerald-700 border-emerald-500/40",
-    highlight: "bg-emerald-500/20 border-emerald-500",
-    text: "text-emerald-700",
+    label: "HIT",
+    dot: "bg-emerald-400",
+    text: "text-emerald-400",
+    cell: "bg-emerald-500/10 border-emerald-500/60",
   },
   compulsory: {
-    label: "Compulsory",
-    badge: "bg-sky-500/15 text-sky-700 border-sky-500/40",
-    highlight: "bg-sky-500/20 border-sky-500",
-    text: "text-sky-700",
+    label: "COMPULSORY",
+    dot: "bg-sky-400",
+    text: "text-sky-400",
+    cell: "bg-sky-500/10 border-sky-500/60",
   },
   conflict: {
-    label: "Conflict",
-    badge: "bg-amber-500/15 text-amber-700 border-amber-500/40",
-    highlight: "bg-amber-500/20 border-amber-500",
-    text: "text-amber-700",
+    label: "CONFLICT",
+    dot: "bg-amber-400",
+    text: "text-amber-400",
+    cell: "bg-amber-500/10 border-amber-500/60",
   },
   capacity: {
-    label: "Capacity",
-    badge: "bg-rose-500/15 text-rose-700 border-rose-500/40",
-    highlight: "bg-rose-500/20 border-rose-500",
-    text: "text-rose-700",
+    label: "CAPACITY",
+    dot: "bg-rose-400",
+    text: "text-rose-400",
+    cell: "bg-rose-500/10 border-rose-500/60",
   },
 }
 

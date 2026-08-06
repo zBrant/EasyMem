@@ -1,5 +1,13 @@
 import animate from "tailwindcss-animate"
 
+const MONO = [
+  '"JetBrains Mono Variable"',
+  "ui-monospace",
+  "SFMono-Regular",
+  "Menlo",
+  "monospace",
+]
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
@@ -11,6 +19,10 @@ export default {
       screens: { "2xl": "1400px" },
     },
     extend: {
+      fontFamily: {
+        sans: MONO,
+        mono: MONO,
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

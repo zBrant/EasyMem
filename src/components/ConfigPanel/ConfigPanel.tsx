@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Panel } from "@/components/Panel"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import {
@@ -10,9 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { useSimulator } from "@/store/useSimulator"
 import { parseSequence } from "@/engine/sequences"
 import { SCENARIOS } from "@/engine/scenarios"
@@ -30,10 +27,20 @@ function Field({
   children: React.ReactNode
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+    <div className="space-y-1">
+      <Label className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+        {label}
+      </Label>
       {children}
     </div>
+  )
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
+      {children}
+    </p>
   )
 }
 
@@ -75,127 +82,131 @@ export function ConfigPanel() {
   const wordSizes = POWERS.filter((p) => p <= config.cache.lineSize)
 
   return (
-    <Card className="h-full overflow-auto">
-      <CardHeader>
-        <CardTitle>Configuration</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Address bits">
-            <Input
-              type="number"
-              min={1}
-              max={32}
-              value={config.memory.addressBits}
-              onChange={(e) =>
-                setConfig({
-                  memory: {
-                    ...config.memory,
-                    addressBits: Number(e.target.value),
-                  },
-                })
-              }
-            />
-          </Field>
-          <Field label="Word size (bytes)">
-            <Select
-              value={String(config.memory.wordSize)}
-              onValueChange={(v) =>
-                setConfig({
-                  memory: { ...config.memory, wordSize: Number(v) },
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {wordSizes.map((w) => (
-                  <SelectItem key={w} value={String(w)}>
-                    {w}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+    <Panel
+      label="Config"
+      className="h-full"
+      bodyClassName="overflow-y-auto p-3"
+    >
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <SectionLabel>Memory</SectionLabel>
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Addr bits">
+              <Input
+                type="number"
+                min={1}
+                max={32}
+                className="h-8 font-mono text-xs"
+                value={config.memory.addressBits}
+                onChange={(e) =>
+                  setConfig({
+                    memory: {
+                      ...config.memory,
+                      addressBits: Number(e.target.value),
+                    },
+                  })
+                }
+              />
+            </Field>
+            <Field label="Word (B)">
+              <Select
+                value={String(config.memory.wordSize)}
+                onValueChange={(v) =>
+                  setConfig({
+                    memory: { ...config.memory, wordSize: Number(v) },
+                  })
+                }
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {wordSizes.map((w) => (
+                    <SelectItem key={w} value={String(w)}>
+                      {w}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
         </div>
 
-        <Separator />
-
-        <div className="grid grid-cols-3 gap-3">
-          <Field label="Cache size (B)">
-            <Select
-              value={String(config.cache.totalSize)}
-              onValueChange={(v) =>
-                setConfig({
-                  cache: { ...config.cache, totalSize: Number(v) },
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {TOTAL_SIZES.map((t) => (
-                  <SelectItem key={t} value={String(t)}>
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field label="Line size (B)">
-            <Select
-              value={String(config.cache.lineSize)}
-              onValueChange={(v) =>
-                setConfig({
-                  cache: { ...config.cache, lineSize: Number(v) },
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {lineSizes.map((l) => (
-                  <SelectItem key={l} value={String(l)}>
-                    {l}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field label="Associativity">
-            <Select
-              value={String(config.cache.associativity)}
-              onValueChange={(v) =>
-                setConfig({
-                  cache: { ...config.cache, associativity: Number(v) },
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {associativities.map((a) => (
-                  <SelectItem key={a} value={String(a)}>
-                    {a}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+        <div className="space-y-2">
+          <SectionLabel>Cache</SectionLabel>
+          <div className="grid grid-cols-3 gap-2">
+            <Field label="Size (B)">
+              <Select
+                value={String(config.cache.totalSize)}
+                onValueChange={(v) =>
+                  setConfig({
+                    cache: { ...config.cache, totalSize: Number(v) },
+                  })
+                }
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TOTAL_SIZES.map((t) => (
+                    <SelectItem key={t} value={String(t)}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Line (B)">
+              <Select
+                value={String(config.cache.lineSize)}
+                onValueChange={(v) =>
+                  setConfig({
+                    cache: { ...config.cache, lineSize: Number(v) },
+                  })
+                }
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {lineSizes.map((l) => (
+                    <SelectItem key={l} value={String(l)}>
+                      {l}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Assoc">
+              <Select
+                value={String(config.cache.associativity)}
+                onValueChange={(v) =>
+                  setConfig({
+                    cache: { ...config.cache, associativity: Number(v) },
+                  })
+                }
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {associativities.map((a) => (
+                    <SelectItem key={a} value={String(a)}>
+                      {a}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
         </div>
 
-        <Field label="Replacement policy">
+        <Field label="Policy">
           <Select
             value={config.policy}
-            onValueChange={(v) =>
-              setConfig({ policy: v as ReplacementPolicyName })
-            }
+            onValueChange={(v) => setConfig({ policy: v as ReplacementPolicyName })}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-8 text-xs uppercase">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -209,33 +220,25 @@ export function ConfigPanel() {
         </Field>
 
         {derived && (
-          <div className="rounded-md bg-muted/50 p-3">
-            <p className="mb-2 text-xs font-medium text-muted-foreground">
-              Derived
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              <Badge variant="secondary">{derived.mapping}</Badge>
-              <Badge variant="secondary">{derived.numLines} lines</Badge>
-              <Badge variant="secondary">{derived.numSets} sets</Badge>
-              <Badge variant="secondary">{derived.setSize}-way</Badge>
-              <Badge variant="secondary">tag {derived.tagBits}b</Badge>
-              <Badge variant="secondary">index {derived.indexBits}b</Badge>
-              <Badge variant="secondary">offset {derived.offsetBits}b</Badge>
-            </div>
+          <div className="rounded-sm border border-border/60 bg-background/40 px-2.5 py-2 font-mono text-[11px] leading-relaxed text-muted-foreground">
+            <span className="text-foreground">{derived.mapping}</span>
+            <br />
+            {derived.numLines} lines · {derived.numSets} sets · {derived.setSize}-way
+            <br />
+            tag {derived.tagBits}b · idx {derived.indexBits}b · off{" "}
+            {derived.offsetBits}b
           </div>
         )}
 
         {errors.length > 0 && (
-          <div className="space-y-1 rounded-md border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-700">
+          <div className="space-y-0.5 rounded-sm border border-rose-500/40 bg-rose-500/5 px-2.5 py-2 text-[11px] leading-relaxed text-rose-400">
             {errors.map((e) => (
-              <p key={e}>• {e}</p>
+              <p key={e}>· {e}</p>
             ))}
           </div>
         )}
 
-        <Separator />
-
-        <Field label="Access sequence (dec / 0x hex / 0b binary)">
+        <Field label="Sequence  ·  dec / 0x / 0b">
           <Textarea
             className="font-mono text-xs"
             rows={3}
@@ -244,26 +247,23 @@ export function ConfigPanel() {
             placeholder="0, 16, 0x20, 0b1010"
           />
         </Field>
-        {parseError && (
-          <p className="text-xs text-rose-600">{parseError}</p>
-        )}
+        {parseError && <p className="text-[11px] text-rose-400">{parseError}</p>}
 
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">Scenarios</p>
-          <div className="flex flex-wrap gap-1.5">
+        <div className="space-y-1.5">
+          <SectionLabel>Scenarios</SectionLabel>
+          <div className="flex flex-wrap gap-1">
             {SCENARIOS.map((s) => (
-              <Button
+              <button
                 key={s.id}
-                variant="outline"
-                size="sm"
                 onClick={() => loadScenario(s.id)}
+                className="rounded-sm border border-border px-2 py-1 text-[10px] uppercase tracking-wide text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
               >
                 {s.name}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   )
 }

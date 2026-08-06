@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Panel } from "@/components/Panel"
 import { EmptyState } from "@/components/EmptyState"
 import { useSimulator } from "@/store/useSimulator"
 import { resultStyle } from "@/utils/colors"
@@ -26,51 +25,51 @@ export function AccessLog() {
     }
   }, [currentStep])
 
-  if (steps.length === 0) {
-    return <EmptyState message="No accesses yet." />
-  }
-
   return (
-    <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <CardHeader className="shrink-0">
-        <CardTitle>Access log</CardTitle>
-      </CardHeader>
-      <CardContent
-        ref={containerRef}
-        className="max-h-[50vh] overflow-auto p-0 lg:max-h-none lg:min-h-0 lg:flex-1"
-      >
-        <ul className="divide-y">
+    <Panel
+      label="Log"
+      className="flex-1"
+      bodyClassName="overflow-y-auto p-0 max-h-[44vh] lg:max-h-none"
+    >
+      {steps.length === 0 ? (
+        <EmptyState message="No accesses yet" />
+      ) : (
+        <div ref={containerRef} className="h-full overflow-y-auto">
           {steps.map((step, index) => {
             const style = resultStyle(step.result)
             const active = index === currentStep
             return (
-              <li key={index}>
-                <button
-                  ref={active ? activeRef : null}
-                  onClick={() => seek(index)}
+              <button
+                key={index}
+                ref={active ? activeRef : null}
+                onClick={() => seek(index)}
+                className={cn(
+                  "flex w-full items-center gap-2 border-l-2 px-3 py-1.5 text-left font-mono text-[11px] transition-colors",
+                  active
+                    ? "border-primary bg-primary/10"
+                    : "border-transparent hover:bg-muted/50",
+                )}
+              >
+                <span className="w-7 shrink-0 tabular-nums text-muted-foreground/60">
+                  {String(index + 1).padStart(3, "0")}
+                </span>
+                <span className="w-12 shrink-0 tabular-nums">
+                  0x{step.access.address.toString(16)}
+                </span>
+                <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", style.dot)} />
+                <span
                   className={cn(
-                    "flex w-full items-center gap-3 px-4 py-2 text-left text-sm hover:bg-muted/50",
-                    active && "bg-muted",
+                    "ml-auto text-[9px] uppercase tracking-wide",
+                    style.text,
                   )}
                 >
-                  <span className="w-8 shrink-0 font-mono text-xs text-muted-foreground">
-                    {index + 1}
-                  </span>
-                  <span className="w-16 shrink-0 font-mono">
-                    0x{step.access.address.toString(16)}
-                  </span>
-                  <Badge
-                    variant="outline"
-                    className={cn("ml-auto", style.badge)}
-                  >
-                    {style.label}
-                  </Badge>
-                </button>
-              </li>
+                  {style.label}
+                </span>
+              </button>
             )
           })}
-        </ul>
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </Panel>
   )
 }
