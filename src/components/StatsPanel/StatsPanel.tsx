@@ -16,7 +16,7 @@ export function StatsPanel() {
   const ratePct = Math.round(s.rate * 100)
 
   return (
-    <Card className="h-full">
+    <Card className="shrink-0">
       <CardHeader>
         <CardTitle>Statistics</CardTitle>
       </CardHeader>

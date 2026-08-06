@@ -26,7 +26,7 @@ export function Controls() {
   const empty = steps.length === 0
 
   return (
-    <Card>
+    <Card className="shrink-0">
       <CardContent className="space-y-3 p-4">
         <div className="flex items-center gap-2">
           <Button

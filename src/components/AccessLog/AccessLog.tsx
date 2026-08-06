@@ -10,10 +10,20 @@ export function AccessLog() {
   const steps = useSimulator((s) => s.steps)
   const currentStep = useSimulator((s) => s.currentStep)
   const seek = useSimulator((s) => s.seek)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const activeRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
-    activeRef.current?.scrollIntoView({ block: "nearest" })
+    const container = containerRef.current
+    const active = activeRef.current
+    if (!container || !active) return
+    const c = container.getBoundingClientRect()
+    const a = active.getBoundingClientRect()
+    if (a.top < c.top) {
+      container.scrollTop -= c.top - a.top + 8
+    } else if (a.bottom > c.bottom) {
+      container.scrollTop += a.bottom - c.bottom + 8
+    }
   }, [currentStep])
 
   if (steps.length === 0) {
@@ -21,11 +31,14 @@ export function AccessLog() {
   }
 
   return (
-    <Card className="h-full overflow-hidden">
-      <CardHeader>
+    <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <CardHeader className="shrink-0">
         <CardTitle>Access log</CardTitle>
       </CardHeader>
-      <CardContent className="max-h-96 overflow-auto p-0">
+      <CardContent
+        ref={containerRef}
+        className="max-h-[50vh] overflow-auto p-0 lg:max-h-none lg:min-h-0 lg:flex-1"
+      >
         <ul className="divide-y">
           {steps.map((step, index) => {
             const style = resultStyle(step.result)
