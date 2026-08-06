@@ -17,6 +17,17 @@ export function createEmptyCache(derived: DerivedConfig): CacheState {
   return sets
 }
 
+export function cloneCache(cache: CacheState): CacheState {
+  return cache.map((set) =>
+    set.map((line) => ({
+      valid: line.valid,
+      tag: line.tag,
+      dirty: line.dirty,
+      metadata: { ...line.metadata },
+    })),
+  )
+}
+
 export interface LookupResult {
   hit: boolean
   setIndex: number
