@@ -81,19 +81,20 @@ React + TypeScript, Vite, Zustand, Tailwind CSS, shadcn/ui (Radix + Tailwind), F
 
 ## Commands
 
-> The project has not been bootstrapped yet, so exact scripts are pending.
-> Once bootstrapped, these are expected:
-
 ```
 npm run dev        # start Vite dev server
-npm run build      # production build
-npm run lint       # lint (ESLint)
+npm run build      # tsc --noEmit && vite build (typecheck + production build)
+npm run preview    # preview the production build
+npm run lint       # lint (ESLint flat config)
 npm run typecheck  # tsc --noEmit
-npm test           # Vitest
+npm test           # vitest run --passWithNoTests
+npm run test:watch # vitest in watch mode
 ```
 
 If `lint` or `typecheck` scripts exist, **always run them after code changes.**
 If they are missing, ask the user for the correct command and add it here.
+
+To add more shadcn/ui components: `npx shadcn@latest add <component>`.
 
 ## Git & commits
 
